@@ -32,4 +32,10 @@ public class ClientResource {
 
         return ResponseEntity.ok().body(list);
     }
+
+    public ResponseEntity<ClientDTO> findOne(Long id){
+        ClientDTO client = clientService.findOne(id);
+
+        return ResponseEntity.ok().body(client);
+    }
 }
