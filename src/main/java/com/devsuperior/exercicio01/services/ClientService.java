@@ -1,9 +1,11 @@
 package com.devsuperior.exercicio01.services;
 
 
+import com.devsuperior.exercicio01.services.exceptions.DatabaseException;
 import com.devsuperior.exercicio01.services.exceptions.ResourceNotFoundException;
-import jdk.jfr.Category;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -27,7 +29,7 @@ public class ClientService {
     public Page<ClientDTO> findAllPaged(PageRequest pagerequest) {
     	Page<Client> list = repository.findAll(pagerequest);
     	
-    	return list.map(x -> new ClientDTO(x));
+    	return list.map(ClientDTO::new);
     }
 
     @Transactional(readOnly = true)
@@ -36,8 +38,6 @@ public class ClientService {
 
         Client entity = obj.orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
         return new ClientDTO(entity);
-
-
     }
 
     @Transactional
@@ -68,6 +68,16 @@ public class ClientService {
             return new ClientDTO(entity);
         } catch (EntityNotFoundException e) {
             throw new ResourceNotFoundException("Id not found " + id);
+        }
+    }
+
+    public void remove(Long id) {
+        try {
+            repository.deleteById(id);
+        } catch(EmptyResultDataAccessException e) {
+            throw new ResourceNotFoundException("Id not found " + id);
+        } catch(DataIntegrityViolationException e) {
+            throw new DatabaseException("Integrity violation");
         }
     }
 }
