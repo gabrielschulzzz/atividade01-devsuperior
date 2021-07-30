@@ -1,6 +1,8 @@
 package com.devsuperior.exercicio01.resources;
 
 import com.devsuperior.exercicio01.dto.ClientDTO;
+import com.devsuperior.exercicio01.services.ClientService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +28,7 @@ public class ClientResource {
             @RequestParam(value = "orderBy", defaultValue = "name") String orderBy
     ) {
         PageRequest pageRequest = PageRequest.of(page, linesPerPage, Sort.Direction.valueOf(direction), orderBy);
-        Page<ClientDTO> list = service.findAllPaged(pageRequest);
+        Page<ClientDTO> list = clientService.findAllPaged(pageRequest);
 
         return ResponseEntity.ok().body(list);
     }
