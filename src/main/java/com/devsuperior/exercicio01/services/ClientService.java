@@ -2,6 +2,7 @@ package com.devsuperior.exercicio01.services;
 
 
 import com.devsuperior.exercicio01.services.exceptions.ResourceNotFoundException;
+import jdk.jfr.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +13,7 @@ import com.devsuperior.exercicio01.dto.ClientDTO;
 import com.devsuperior.exercicio01.entities.Client;
 import com.devsuperior.exercicio01.repositories.IClient;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 
@@ -38,6 +40,7 @@ public class ClientService {
 
     }
 
+    @Transactional
     public ClientDTO insert(ClientDTO dto) {
         Client entity = new Client();
         entity.setBirthDate(dto.getBirthDate());
@@ -49,5 +52,22 @@ public class ClientService {
         entity = repository.save(entity);
 
         return new ClientDTO(entity);
+    }
+
+    public ClientDTO update(Long id, ClientDTO dto) {
+        try {
+            Client entity = repository.getOne(id);
+
+            entity.setBirthDate(dto.getBirthDate());
+            entity.setChildren(dto.getChildren());
+            entity.setCpf(dto.getCpf());
+            entity.setIncome(dto.getIncome());
+            entity.setName(dto.getName());
+
+            entity = repository.save(entity);
+            return new ClientDTO(entity);
+        } catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException("Id not found " + id);
+        }
     }
 }
